@@ -1,0 +1,90 @@
+/* Buttons */
+.placeholder {
+    width: 60px;
+    height: 25px;
+    background-color: #eee;
+}
+
+.orangeButton {
+    width: 60px;
+    height: 25px;
+    background-color: #ffbb00;
+    margin: 2px;
+    padding: 3px;
+}
+
+.clearButton {
+    width: 60px;
+    height: 25px;
+    background-color: #eee;
+    margin: 2px;
+    padding: 3px;
+    border: 0;
+    border-color: #eee;
+}
+
+/* Door */
+.elevator-door {
+    display: flex;
+    flex-direction: row;
+    column-gap: 20px;
+}
+
+/* ElevatorBank */
+.floors {
+    display: flex;
+    flex-direction: column-reverse;
+    background-color: #5588ff;
+    padding: 3px;
+}
+
+.elevator-bank {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+}
+
+.elevator-bank > * {
+    background-color: #fff;
+}
+
+/* Elevator */
+
+.elevator {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+}
+
+.queue {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow-x: auto;
+}
+
+.queue > * {
+    margin-right: 10px;
+    margin-bottom: 10px;
+    width: 50px;
+    background-color: #eee;
+    text-align: center;
+}
+
+/* Floor */
+.elevator-floor {
+    display: flex;
+    flex-direction: row;
+    column-gap: 10px;
+    margin-bottom: 20px;
+    background-color: #eee;
+  }
+
+  /* Panel */
+.elevator-panel {
+    display: flex;
+    flex-direction: row;
+    column-gap: 10px;
+    margin-bottom: 20px;
+    background-color: #eee;
+  }
