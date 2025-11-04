@@ -9,6 +9,10 @@ export default {
     props: {
         panelType: "default",
         floorNumber: 0,
+        isFire: {
+            type: Boolean,
+            default: false
+        },
         panelButtonConfiguration:Array
     },
     data() {
@@ -19,7 +23,7 @@ export default {
     },
     created() {
         this.buttonConfiguration = this.panelButtonConfiguration.map((button) => {
-            let label = button === "down" ? "&darr;" : button === "up" ? "&uarr;" : button === "" ? "&nbsp;" : button + "";
+            let label = button === "fire" ? "fire" : button === "emergency" ? "emergency" : button === "down" ? "&darr;" : button === "up" ? "&uarr;" : button === "alert" ? "alert" : button === "" ? "&nbsp;" : button + "";
             let event = button === "" ? "" : isNaN(button) ? button : "destination"; 
             let data = isNaN(button) ? this.floorNumber : button;
             return {
@@ -32,15 +36,25 @@ export default {
 
         this.emitTarget = this.floorNumber;
     },
-    emits: ['up', 'down', 'destination'],
+    emits: ['up', 'down', 'emergency', 'fire', 'destination'],
     methods: {
         handleUp(data) {
+            // if (this.isFire) return;
             this.$emit('up', data);
         },
         handleDown(data) {
+            // if (this.isFire) return;
             this.$emit('down', data);
         },
+        handleEmergency(data) {
+            if (this.isFire) return;
+            this.$emit('emergency', data);
+        },
+        handleFire(data) {
+            this.$emit('fire', data);
+        },
         handleDestination(data) {
+            if (this.isFire) return;
             this.$emit('destination', data);
         },
     },
@@ -56,6 +70,8 @@ export default {
         @destination="handleDestination"
         @down="handleDown"
         @up="handleUp"
+        @emergency="handleEmergency"
+        @fire="handleFire"
     />
 </template>
 

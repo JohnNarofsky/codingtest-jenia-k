@@ -16,10 +16,16 @@ export default {
             default: 0
         },
         floorRequest: {}, 
+        isFire: {
+            type: Boolean,
+            default: false
+        }
     },
     data() {
         return {
             isMoving: false,
+            isArriving: false,
+            isEmergency: false,
             currentDirection: "",
             doorStatus: "CLOSED",
             destinationQueue: [],
@@ -43,15 +49,19 @@ export default {
             deep: true,
             handler (newFloorRequest){
                 //newFloorRequest comes in with two properties: the floorNumber, and a direction: "up" or "down"
-                if (newFloorRequest?.floorNumber !== undefined){
+                if (newFloorRequest?.floorNumber !== undefined && !this.isFire){
                     this.destinationQueue.push(newFloorRequest.floorNumber);
+                } else if (this.isFire) {
+                    this.destinationQueue.length = 0;
+                    this.destinationQueue.push(1)
                 }
+                
             }
         },
         destinationQueue: {
             immediate: true,
             handler (oldQueue, newQueue){
-                if (!this.isMoving){
+                if (!this.isMoving && !this.isFire && !this.isArriving){
                     this.move();
                 }
             },
@@ -60,22 +70,45 @@ export default {
     },
     methods: {
         move(){
+            // Stop elevator if emergency button was pressed
+            if (this.isEmergency) return;
+            
             if (this.currentFloor === this.destinationQueue[0]){
                 this.destinationQueue.shift();
+                this.isArriving = true;
                 this.handleArrival();
             } else {
+
+                // Waits before doors close to move
+                if (this.isArriving) return;
                 this.isMoving = true;
                 this.currentDirection = this.currentFloor < this.destinationQueue[0] ? "up" : this.currentFloor > this.destinationQueue[0] ? "down" : "";
                 this.targetFloor = this.destinationQueue[0];
                 let target = this.currentFloor;
                 this.previousFloor = this.currentFloor;
+                
                 if (this.currentDirection === "up"){
                     target++;
+                    // Completing all requests going up
+                    this.targetFloor = Math.max(...this.destinationQueue);
+                    this.destinationQueue = this.destinationQueue.filter(floor => floor !== this.targetFloor);
+                    this.destinationQueue.unshift(this.targetFloor)
                 }
                 if (this.currentDirection == "down"){
                     target--;
+                    // Completing all requests going down 
+                    this.targetFloor = Math.min(...this.destinationQueue);
+                    this.destinationQueue = this.destinationQueue.filter(floor => floor !== this.targetFloor);
+                    this.destinationQueue.unshift(this.targetFloor)
                 }
                 this.currentFloor = target;
+
+                // Elevator stops along the way
+                if (this.destinationQueue.includes(this.currentFloor)) {
+                    this.destinationQueue = this.destinationQueue.filter(floor => floor !== this.currentFloor);
+                    this.isArriving = true;
+                    this.handleArrival();
+                }
                 this.currentMoveTimeout = setTimeout(() => {
                     this.move();
                 }, 3000);
@@ -94,6 +127,7 @@ export default {
                                 this.doorStatus = "CLOSED";
                                 setTimeout(()=>{
                                     if (this.destinationQueue.length > 0){
+                                        this.isArriving = false;
                                         this.move();
                                     }
                                 }, 3000);
@@ -109,6 +143,20 @@ export default {
                 this.destinationQueue.push(data);
             }
         },
+        handleEmergency(data) {
+            if (this.isEmergency){
+                this.isEmergency = false;
+                if (this.destinationQueue.length > 0){
+                    this.isArriving = false;
+                    this.move();
+                }
+                console.log("Emergency button released");
+            } else {
+                this.isEmergency = true;
+                this.isMoving = false;
+                console.log("Emergency button pressed");
+            }
+        },
     }
 }
 </script>
@@ -122,7 +170,9 @@ export default {
                 :floor-number="-1" 
                 :panel-type="panelType" 
                 :panel-button-configuration="this.panelButtonConfiguration"
+                :isFire="isFire"
                 @destination="handleDestination"
+                @emergency="handleEmergency"
             />
         </div>
         <Door :door-status="doorStatus" />

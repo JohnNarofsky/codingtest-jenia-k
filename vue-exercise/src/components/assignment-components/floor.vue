@@ -9,7 +9,11 @@ export default {
     props: {
         floorNumber: 0,
         panelType: "default",
-        floorPanelButtonConfiguration: Array
+        floorPanelButtonConfiguration: Array,
+        isFire: {
+            type: Boolean,
+            default: false
+        }
     },
     data() {
         return {
@@ -23,10 +27,15 @@ export default {
     },
     methods: {
         handleUp(data) {
+            if (this.isFire) return;
             this.$emit('up', data);
         },
         handleDown(data) {
+            if (this.isFire) return;
             this.$emit('down', data);
+        },
+        handleFire(data) {
+            this.$emit('fire', data);
         },
     },
 }
@@ -41,6 +50,7 @@ export default {
       :panel-button-configuration="panelButtonConfiguration"
       @down="handleDown"
       @up="handleUp"
+      @fire="handleFire"
     />
   </div>
 </template>

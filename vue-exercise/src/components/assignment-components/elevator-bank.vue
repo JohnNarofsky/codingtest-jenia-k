@@ -14,6 +14,7 @@ export default {
     },
     data() {
         return {
+            isFire: false,
             setupElevatorData: this.elevatorData,
             floors: [],
             elevators: [],
@@ -40,22 +41,34 @@ export default {
     },
     methods: {
         getFloorPanelButtonConfiguration(floorNumber){
+            // if (this.isFire) return;
             if (floorNumber === this.floors.length - 1){
                 return ["", "down"];
             }
             if (floorNumber === 0) {
-                return ["up", ""];
+                return ["up", "fire"];
             }
             return ["up", "down"];
         },
         getElevatorPanelButtonConfiguration() {
-            return [...this.floors.keys()].map(f => f + 1);
+            return [...Array.from(this.floors.keys()).map(f => f + 1), "emergency"];
         },
         handleUp(data) {
             this.floorRequest = {floorNumber: data, direction: 'up'};
         },
         handleDown(data) {
             this.floorRequest = {floorNumber: data, direction: 'down'};
+        },
+        handleFire(data) {
+            if (this.isFire) {
+                this.isFire = false;
+                this.floorRequest = {floorNumber: data, direction: 'up'};
+                console.log("In case of fire button released");
+            } else {
+                this.isFire = true;
+                this.floorRequest = {floorNumber: data, direction: 'down'};
+                console.log("In case of fire button pressed");
+            }
         },
     },
 }
@@ -70,8 +83,10 @@ export default {
             <Floor v-for="(floor, index) in floors"
                 :floor-number="index + 1"
                 :floor-panel-button-configuration="getFloorPanelButtonConfiguration(index)"
+                :isFire="isFire"
                 @down="handleDown"
                 @up="handleUp"
+                @fire="handleFire"
 
             />
         </div>
@@ -81,6 +96,7 @@ export default {
                 :floors="elevator.floors"
                 :floor-request="this.floorRequest"
                 :elevator-panel-button-configuration="getElevatorPanelButtonConfiguration()"
+                :isFire="isFire"
             />
         </div>
     </div>
