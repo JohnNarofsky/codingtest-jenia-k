@@ -53,7 +53,8 @@ export default {
                     this.destinationQueue.push(newFloorRequest.floorNumber);
                 } else if (this.isFire) {
                     this.destinationQueue.length = 0;
-                    this.destinationQueue.push(1)
+                    this.destinationQueue.push(1);
+                    this.move();
                 }
                 
             }
@@ -61,7 +62,7 @@ export default {
         destinationQueue: {
             immediate: true,
             handler (oldQueue, newQueue){
-                if (!this.isMoving && !this.isFire && !this.isArriving){
+                if (!this.isMoving && !this.isFire){
                     this.move();
                 }
             },
@@ -126,8 +127,8 @@ export default {
                             setTimeout(()=> {
                                 this.doorStatus = "CLOSED";
                                 setTimeout(()=>{
+                                    this.isArriving = false;
                                     if (this.destinationQueue.length > 0){
-                                        this.isArriving = false;
                                         this.move();
                                     }
                                 }, 3000);
@@ -186,6 +187,11 @@ export default {
         <div class="queue">
             <div v-for="destination in destinationQueue">{{ destination }}</div>
         </div>
+        <div class="floor-doors">
+            <div v-for="floor in 6">
+                Floor {{ floor }}: {{ floor===currentFloor ? doorStatus : "CLOSED" }}
+            </div>
+        </div>
     </div>
 </template>
 
@@ -194,6 +200,15 @@ export default {
     display: flex;
     flex-direction: column;
     row-gap: 20px;
+}
+.floor-doors{
+    position: absolute;
+    top: 95px;
+    right: 110px;
+    background-color: #eee;
+    display: flex;
+    flex-direction: column-reverse;
+    row-gap: 25px;
 }
 
 .queue {

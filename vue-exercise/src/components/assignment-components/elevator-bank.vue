@@ -62,7 +62,6 @@ export default {
         handleFire(data) {
             if (this.isFire) {
                 this.isFire = false;
-                this.floorRequest = {floorNumber: data, direction: 'up'};
                 console.log("In case of fire button released");
             } else {
                 this.isFire = true;

@@ -39,11 +39,9 @@ export default {
     emits: ['up', 'down', 'emergency', 'fire', 'destination'],
     methods: {
         handleUp(data) {
-            // if (this.isFire) return;
             this.$emit('up', data);
         },
         handleDown(data) {
-            // if (this.isFire) return;
             this.$emit('down', data);
         },
         handleEmergency(data) {
